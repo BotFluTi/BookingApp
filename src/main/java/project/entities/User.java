@@ -11,16 +11,23 @@ public class User {
     private String username;
     private String email;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public enum Role {
+        ADMIN,
+        EMPLOYEE,
+        USER
+    }
+
+
     public void setId(Long id) {
         this.id = id;
     }
     public Long getId() {
         return id;
     }
-
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private UserGroup userGroup;
     public String getUsername() {
         return username;
     }
@@ -39,11 +46,6 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    public UserGroup getUserGroup() {
-        return userGroup;
-    }
-    public void setUserGroup(UserGroup userGroup) {
-        this.userGroup = userGroup;
-    }
-
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 }
