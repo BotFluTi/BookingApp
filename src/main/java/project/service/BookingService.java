@@ -6,6 +6,8 @@ import project.common.BookingDto;
 import project.entities.Booking;
 import project.entities.Room;
 import project.entities.User;
+import project.events.BookingEvent;
+import project.messaging.BookingEventProducer;
 import project.repository.BookingRepository;
 import project.repository.RoomRepository;
 
@@ -19,10 +21,14 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final RoomRepository roomRepository;
+    private final BookingEventProducer eventProducer;
 
-    public BookingService(BookingRepository bookingRepository, RoomRepository roomRepository) {
+    public BookingService(BookingRepository bookingRepository,
+                          RoomRepository roomRepository,
+                          BookingEventProducer eventProducer) {
         this.bookingRepository = bookingRepository;
         this.roomRepository = roomRepository;
+        this.eventProducer = eventProducer;
     }
 
     public boolean isRoomFree(Long roomId, LocalDate checkIn, LocalDate checkOut) {
@@ -55,7 +61,20 @@ public class BookingService {
         b.setCheckOut(checkOut);
         b.setStatus(Booking.Status.CONFIRMED);
 
-        return BookingDto.fromEntity(bookingRepository.save(b));
+        b = bookingRepository.save(b);
+
+        eventProducer.publish(new BookingEvent(
+                BookingEvent.Type.CREATED,
+                b.getId(),
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                room.getId(),
+                b.getCheckIn(),
+                b.getCheckOut()
+        ));
+
+        return BookingDto.fromEntity(b);
     }
 
     public List<BookingDto> getUserBookings(Long userId) {
@@ -77,11 +96,21 @@ public class BookingService {
             throw new IllegalStateException("You cannot cancel this booking.");
         }
 
-
         b.setStatus(Booking.Status.CANCELLED);
         bookingRepository.save(b);
-    }
 
+        User u = b.getUser();
+        eventProducer.publish(new BookingEvent(
+                BookingEvent.Type.CANCELLED,
+                b.getId(),
+                u != null ? u.getId() : null,
+                u != null ? u.getEmail() : null,
+                u != null ? u.getUsername() : null,
+                b.getRoom() != null ? b.getRoom().getId() : null,
+                b.getCheckIn(),
+                b.getCheckOut()
+        ));
+    }
 
     public List<BookingDto> getAllCurrentBookings() {
         return bookingRepository
@@ -108,5 +137,4 @@ public class BookingService {
                         BookingRepository.IdUsername::getUsername
                 ));
     }
-
 }
