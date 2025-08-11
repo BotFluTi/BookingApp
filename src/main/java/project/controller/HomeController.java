@@ -2,18 +2,18 @@ package project.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+
 
 @Controller
 public class HomeController {
 
     @GetMapping("/")
-    public String index() {
+    public String home(Model model) {
+        model.addAttribute("currentPage", "/");
         return "home/index";
     }
 
-    @GetMapping("/about")
-    public String about() {
-        return "about/about";
-    }
 
 }
+

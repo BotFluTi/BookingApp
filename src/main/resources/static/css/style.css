@@ -5,6 +5,7 @@ html, body {
 }
 
 body {
+    background-color: #e1efff;
     display: flex;
     flex-direction: column;
 }
@@ -12,3 +13,32 @@ body {
 main {
     flex: 1;
 }
+
+
+.custom-btn {
+    padding: 15px 40px;
+    font-size: 20px;
+    border-radius: 50px;
+    background-color: #0056b3;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: none;
+}
+
+.custom-btn:hover {
+    background-color: #0056b3;
+    color: white;
+    transform: none;
+}
+
+/* toate imaginile cardurilor au aceeași înălțime */
+.room-card .card-img-top {
+    width: 100%;
+    height: 240px;       /* ajustează 220–300px după gust */
+    object-fit: cover;   /* taie surplusul, păstrează compoziția */
+}
+
+/* opțional: aliniază perfect butoanele, indiferent de descriere */
+.room-card .card-title { min-height: 2.8rem; }  /* ~2 rânduri */
+.room-card .card-text  { min-height: 5.6rem; }  /* ~3–4 rânduri */

@@ -14,9 +14,46 @@
 <div th:replace="tags/navbar :: navbar"></div>
 
 <main class="container mt-5">
-<h1>Welcome!</h1>
+  <h1 class="text-center mb-4">Welcome to Hotel Horizon</h1>
+  <p class="lead text-center">Our 4-star hotel offers a luxury experience with premium services to make your stay unforgettable.</p>
+
+  <!-- About Section -->
+  <div class="text-center mb-5">
+    <h3>About Us</h3>
+    <p>At Hotel Horizon, we believe in providing the highest standards of comfort and luxury. Our 4-star hotel offers spacious rooms with modern amenities, beautiful views, and exceptional service, ensuring that your stay is both relaxing and enjoyable.</p>
+    <p>Whether you're here for business or leisure, we offer a variety of room options designed to cater to your needs. From the moment you step into our hotel, we are committed to ensuring your comfort and satisfaction throughout your stay.</p>
+  </div>
+
+  <h4 class="text-center mb-4">Our Premium Services</h4>
+  <div class="row text-center">
+    <div class="col-md-4 mb-4">
+      <i class="bi bi-house-door-fill" style="font-size: 40px;"></i>
+      <h5 class="mt-3">24/7 Room Service</h5>
+      <p>Enjoy our around-the-clock room service for all your needs, anytime.</p>
+    </div>
+    <div class="col-md-4 mb-4">
+      <i class="bi bi-wifi" style="font-size: 40px;"></i>
+      <h5 class="mt-3">Free Wi-Fi</h5>
+      <p>Stay connected with fast and reliable Wi-Fi throughout the hotel.</p>
+    </div>
+    <div class="col-md-4 mb-4">
+      <i class="bi bi-spa" style="font-size: 40px;"></i>
+      <h5 class="mt-3">Luxury Spa & Wellness</h5>
+      <p>Relax and rejuvenate with our exclusive spa and wellness services.</p>
+    </div>
+  </div>
+
+  <div class="text-center" style="position: relative;">
+    <a href="/rooms" class="btn btn-lg custom-btn">Reserve Now</a>
+  </div>
+
+  <div class="text-center mt-5">
+    <h5>Contact Us</h5>
+    <p class="lead">You can contact us at <strong>info@hotelhorizon.com</strong> for any inquiries, feedback, or issues you may have. We are here to help!</p>
+  </div>
 
 </main>
+
 
 <div th:replace="tags/footer :: footer"></div>
 
