@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <title>Navbar</title>
 
-    <!-- Bootstrap CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- Fragmentul navbar -->
-<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav th:fragment="navbar"
+     class="navbar navbar-expand-lg navbar-dark bg-dark"
+     th:with="u=${session.loggedInUser},
+              isAdmin=${u != null and u.role != null and u.role.name() == 'ADMIN'}">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">Hotel Horizon</a>
 
@@ -23,19 +25,36 @@
                 <li class="nav-item" th:unless="${currentPage == '/rooms'}">
                     <a class="nav-link" href="/rooms">See Available Rooms</a>
                 </li>
-                <li class="nav-item" th:if="${session.loggedInUser == null}">
-                    <a class="nav-link" th:href="@{/login}">Login</a>
+
+                <li class="nav-item" th:if="${u != null }">
+                    <a class="nav-link"
+                       th:classappend="${currentPage == '/my-bookings'} ? ' active'"
+                       th:href="@{/my-bookings}">
+                        My bookings
+                    </a>
                 </li>
 
-                <li class="nav-item" th:if="${session.loggedInUser != null}">
+                <li class="nav-item" th:if="${isAdmin}">
+                    <a class="nav-link"
+                       th:classappend="${currentPage == '/admin/bookings'} ? ' active'"
+                       th:href="@{/admin/bookings}">
+                        All bookings
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${u == null}">
+                    <a class="nav-link" th:href="@{/login}">Login</a>
+                </li>
+                <li class="nav-item" th:if="${u != null}">
                     <a class="nav-link" th:href="@{/logout}">Logout</a>
                 </li>
+
             </ul>
         </div>
     </div>
 </nav>
 
-<!-- Bootstrap JS (pentru meniul responsive) -->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

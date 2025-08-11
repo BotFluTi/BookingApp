@@ -25,6 +25,7 @@
         </div>
 
         <form th:action="@{/login}" method="post">
+            <input type="hidden" name="next" th:value="${next}">
             <div class="form-group mb-3">
                 <label>Username</label>
                 <input type="text" class="form-control" name="username" />
@@ -41,7 +42,6 @@
         </p>
     </div>
 
-    <!-- REGISTER FORM -->
     <div id="registerForm" th:style="${showRegister} ? 'display:block;' : 'display:none;'">
         <h2>Register</h2>
 

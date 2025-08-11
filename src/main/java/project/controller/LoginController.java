@@ -23,27 +23,32 @@ public class LoginController {
     private PasswordService passwordService;
 
     @GetMapping("/login")
-    public String showLoginForm(Model model) {
+    public String showLoginForm(@RequestParam(required = false) String next, Model model) {
         model.addAttribute("showRegister", false);
+        model.addAttribute("next", next);
         return "auth/login";
     }
-
 
     @PostMapping("/login")
     public String processLogin(@RequestParam String username,
                                @RequestParam String password,
+                               @RequestParam(required = false) String next,
                                HttpSession session,
                                Model model) {
         User user = userRepository.findByUsername(username).orElse(null);
 
         if (user == null || !passwordService.matches(password, user.getPassword())) {
             model.addAttribute("error", "Invalid username or password");
+            model.addAttribute("next", next);
             return "auth/login";
         }
 
         session.setAttribute("loggedInUser", user);
-        return "redirect:/";
+
+        String dest = (next != null && next.startsWith("/")) ? next : "/";
+        return "redirect:" + dest;
     }
+
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
