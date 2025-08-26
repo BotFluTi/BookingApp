@@ -32,13 +32,11 @@ main {
     transform: none;
 }
 
-/* toate imaginile cardurilor au aceeași înălțime */
 .room-card .card-img-top {
     width: 100%;
-    height: 240px;       /* ajustează 220–300px după gust */
-    object-fit: cover;   /* taie surplusul, păstrează compoziția */
+    height: 240px;
+    object-fit: cover;
 }
 
-/* opțional: aliniază perfect butoanele, indiferent de descriere */
-.room-card .card-title { min-height: 2.8rem; }  /* ~2 rânduri */
-.room-card .card-text  { min-height: 5.6rem; }  /* ~3–4 rânduri */
+.room-card .card-title { min-height: 2.8rem; }
+.room-card .card-text  { min-height: 5.6rem; }

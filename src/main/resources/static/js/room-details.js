@@ -2,10 +2,10 @@
     const modal = document.getElementById('reserveModal');
     if (!modal) return;
 
-    const rangeInput   = modal.querySelector('#dateRange');
-    const checkInH     = modal.querySelector('#checkInHidden');
-    const checkOutH    = modal.querySelector('#checkOutHidden');
-    const submitBtn    = modal.querySelector('button[type="submit"]');
+    const rangeInput = modal.querySelector('#dateRange');
+    const checkInH   = modal.querySelector('#checkInHidden');
+    const checkOutH  = modal.querySelector('#checkOutHidden');
+    const submitBtn  = modal.querySelector('button[type="submit"]');
 
     let fp;
     let disabledRanges = [];
@@ -13,7 +13,6 @@
     const pad = n => String(n).padStart(2, '0');
     const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     const parseYMD = s => { const [Y,M,D]=s.split('-').map(Number); return new Date(Y, M-1, D); };
-
     const apiToDisable = (arr) => arr.map(r => ({
         from: r.start,
         to: ymd(new Date(parseYMD(r.end).getTime() - 24*60*60*1000))
@@ -34,10 +33,10 @@
         try {
             const roomId = btn.getAttribute('data-room-id');
             const res = await fetch(`/api/rooms/${roomId}/disabled-dates`, { headers: { 'Accept':'application/json' }});
-            disabledRanges = await res.json(); // [{start,end(exclusive)}]
+            disabledRanges = await res.json();
         } catch { disabledRanges = []; }
 
-        if (fp) { fp.destroy(); }
+        if (fp) fp.destroy();
 
         fp = flatpickr(rangeInput, {
             mode: 'range',
@@ -48,10 +47,8 @@
                 if (selectedDates.length === 2) {
                     const ci = selectedDates[0];
                     const co = selectedDates[1];
-
                     checkInH.value  = ymd(ci);
                     checkOutH.value = ymd(co);
-
                     submitBtn.disabled = false;
                 } else {
                     checkInH.value = '';

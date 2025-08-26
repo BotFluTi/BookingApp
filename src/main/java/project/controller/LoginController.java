@@ -1,26 +1,19 @@
 package project.controller;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
-import project.entities.User;
-import project.repository.UserRepository;
-import project.service.PasswordService;
 import project.service.UserService;
 
 @Controller
 public class LoginController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
-    private PasswordService passwordService;
 
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(required = false) String next, Model model) {
@@ -29,30 +22,11 @@ public class LoginController {
         return "auth/login";
     }
 
-    @PostMapping("/login")
-    public String processLogin(@RequestParam String username,
-                               @RequestParam String password,
-                               @RequestParam(required = false) String next,
-                               HttpSession session,
-                               Model model) {
-        User user = userRepository.findByUsername(username).orElse(null);
-
-        if (user == null || !passwordService.matches(password, user.getPassword())) {
-            model.addAttribute("error", "Invalid username or password");
-            model.addAttribute("next", next);
-            return "auth/login";
-        }
-
-        session.setAttribute("loggedInUser", user);
-
-        String dest = (next != null && next.startsWith("/")) ? next : "/";
-        return "redirect:" + dest;
-    }
-
-
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    public String logout(HttpServletResponse res) {
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true).secure(false).sameSite("Lax").path("/").maxAge(0).build();
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return "redirect:/login?logout=true";
     }
 
@@ -71,13 +45,11 @@ public class LoginController {
             model.addAttribute("showRegister", true);
             return "auth/login";
         }
-
         if (password.length() < 6) {
             model.addAttribute("registerErrorMessage", "Password must be at least 6 characters.");
             model.addAttribute("showRegister", true);
             return "auth/login";
         }
-
         try {
             userService.createUser(username, email, password);
             return "redirect:/login?registered=true";
@@ -87,6 +59,4 @@ public class LoginController {
             return "auth/login";
         }
     }
-
-
 }

@@ -1,11 +1,13 @@
 package project.controller;
 
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import project.entities.User;
+import project.repository.UserRepository;
 import project.service.BookingService;
 
 import java.util.List;
@@ -15,13 +17,17 @@ import java.util.Map;
 public class BookingController {
 
     private final BookingService bookingService;
-    public BookingController(BookingService bookingService) { this.bookingService = bookingService; }
+    private final UserRepository userRepository;
+
+    public BookingController(BookingService bookingService, UserRepository userRepository) {
+        this.bookingService = bookingService;
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/my-bookings")
-    public String myBookings(Model model, HttpSession session) {
-        Object logged = session.getAttribute("loggedInUser");
-        if (!(logged instanceof User u)) return "redirect:/login?next=/my-bookings";
-
+    public String myBookings(Model model, Authentication auth) {
+        User u = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new IllegalStateException("User not found: " + auth.getName()));
         model.addAttribute("currentPage", "/my-bookings");
         model.addAttribute("bookings", bookingService.getUserBookings(u.getId()));
         return "booking/my-bookings";
@@ -29,11 +35,10 @@ public class BookingController {
 
     @PostMapping("/bookings/{id}/cancel")
     public String cancelBooking(@PathVariable Long id,
-                                HttpSession session,
+                                Authentication auth,
                                 RedirectAttributes ra) {
-        Object logged = session.getAttribute("loggedInUser");
-        if (!(logged instanceof User u)) return "redirect:/login?next=/my-bookings";
-
+        User u = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new IllegalStateException("User not found: " + auth.getName()));
         try {
             bookingService.cancelBooking(id, u);
             ra.addFlashAttribute("successMessage", "Booking cancelled.");
@@ -43,12 +48,9 @@ public class BookingController {
         return "redirect:/my-bookings";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/bookings")
-    public String allBookings(Model model, HttpSession session) {
-        Object logged = session.getAttribute("loggedInUser");
-        if (!(logged instanceof User u) || u.getRole() != User.Role.ADMIN) {
-            return "redirect:/";
-        }
+    public String allBookings(Model model) {
         model.addAttribute("currentPage", "/admin/bookings");
         model.addAttribute("bookings", bookingService.getAllCurrentBookings());
         model.addAttribute("usernames", bookingService.getCurrentBookingUsernames());
@@ -63,21 +65,17 @@ public class BookingController {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/bookings/{id}/cancel")
-    public String adminCancel(@PathVariable Long id,
-                              HttpSession session,
-                              RedirectAttributes ra) {
-        Object logged = session.getAttribute("loggedInUser");
-        if (!(logged instanceof User u) || u.getRole() != User.Role.ADMIN) {
-            return "redirect:/";
-        }
+    public String adminCancel(@PathVariable Long id, Authentication auth, RedirectAttributes ra) {
         try {
-            bookingService.cancelBooking(id, u); // vede mai jos opțiunea pt. past stays
+            User admin = userRepository.findByUsername(auth.getName())
+                    .orElseThrow(() -> new IllegalStateException("User not found: " + auth.getName()));
+            bookingService.cancelBooking(id, admin);
             ra.addFlashAttribute("successMessage", "Booking cancelled.");
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/bookings";
     }
-
 }

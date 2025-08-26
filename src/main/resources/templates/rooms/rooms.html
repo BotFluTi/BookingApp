@@ -15,16 +15,15 @@
 <main class="container mt-5">
     <h2 class="text-center mb-4">Available Rooms</h2>
 
-
     <div class="d-flex justify-content-end mb-3" th:if="${isAdmin}">
         <a class="btn btn-success" th:href="@{/admin/roomtypes/new}">+ Add room type</a>
     </div>
 
+    <div id="liveMsg" class="alert mt-2" style="display:none;"></div>
 
     <div class="alert alert-info" th:if="${#lists.isEmpty(roomTypes)}">
         No room types yet. Click “Add room type” to create your first card.
     </div>
-
 
     <div class="row g-4" th:if="${!#lists.isEmpty(roomTypes)}">
         <div class="col-md-4" th:each="type : ${roomTypes}">
@@ -35,15 +34,14 @@
                     <p class="card-text flex-grow-1" th:text="${type.description}"></p>
                     <a class="btn btn-primary mt-auto" th:href="@{'/rooms/' + ${type.typeCode}}">Reserve now</a>
 
-
                     <div th:if="${isAdmin}" class="mt-2">
                         <a class="btn btn-warning btn-sm" th:href="@{'/admin/roomtypes/edit/' + ${type.id}}">Edit</a>
 
-                        <form th:action="@{'/admin/roomtypes/delete/' + ${type.id}}"
-                              method="post" class="d-inline"
-                              onsubmit="return confirm('Delete this room type?');">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
+                        <button type="button"
+                                class="btn btn-danger btn-sm ms-1 js-delete-roomtype"
+                                th:attr="data-type-id=${type.id}">
+                            Delete
+                        </button>
                     </div>
 
                 </div>
@@ -53,6 +51,6 @@
 </main>
 
 <div th:replace="tags/footer :: footer"></div>
-
+<script src="/js/admin-roomtypes-list.js"></script>
 </body>
 </html>

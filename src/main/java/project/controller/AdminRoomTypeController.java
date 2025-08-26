@@ -1,5 +1,7 @@
 package project.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +11,7 @@ import project.service.RoomTypeService;
 
 @Controller
 @RequestMapping("/admin/roomtypes")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminRoomTypeController {
 
     private final RoomTypeService roomTypeService;
@@ -30,9 +33,17 @@ public class AdminRoomTypeController {
     public String create(@RequestParam String typeCode,
                          @RequestParam String name,
                          @RequestParam String description,
-                         @RequestParam String imagePath) {
-        roomTypeService.createRoomType(typeCode, name, description, imagePath);
-        return "redirect:/rooms";
+                         @RequestParam String imagePath,
+                         Model model) {
+        try {
+            roomTypeService.createRoomType(typeCode, name, description, imagePath);
+            return "redirect:/rooms";
+        } catch (DataIntegrityViolationException ex) {
+            model.addAttribute("mode", "create");
+            model.addAttribute("typeCodes", RoomType.TypeCode.values());
+            model.addAttribute("formError", "This type code already exists: " + typeCode);
+            return "admin/roomtype-form";
+        }
     }
 
     // EDIT – formular

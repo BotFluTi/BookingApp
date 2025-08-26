@@ -13,8 +13,9 @@
 <main class="container mt-5">
     <h2 class="mb-4">All bookings</h2>
 
-    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
-    <div class="alert alert-danger"  th:if="${errorMessage}"   th:text="${errorMessage}"></div>
+    <div id="flashSuccess" class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div id="flashError"   class="alert alert-danger"  th:if="${errorMessage}"   th:text="${errorMessage}"></div>
+    <div id="liveMsg" class="alert mt-2" style="display:none;"></div>
 
     <div class="alert alert-info" th:if="${#lists.isEmpty(bookings)}">No active bookings.</div>
 
@@ -26,31 +27,34 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="b, i : ${bookings}">
+            <tr th:each="b, i : ${bookings}" th:attr="data-booking-item=${b.id}">
                 <td th:text="${i.index+1}"></td>
                 <td th:text="${usernames[b.id]} ?: '—'"></td>
                 <td th:text="${b.roomNumber}"></td>
                 <td th:text="${b.roomType}"></td>
                 <td th:text="${b.checkIn + ' → ' + b.checkOut}"></td>
                 <td>
-          <span class="badge" th:classappend="${b.status=='CONFIRMED'}?'bg-success':'bg-secondary'"
-                th:text="${b.status}"></span>
+    <span class="badge"
+          th:classappend="${b.status=='CONFIRMED'}?'bg-success':'bg-secondary'"
+          th:text="${b.status}"></span>
                 </td>
                 <td class="text-end">
-                    <form th:if="${b.status=='CONFIRMED'}"
-                          th:action="@{'/admin/bookings/' + ${b.id} + '/cancel'}"
-                          method="post"
-                          onsubmit="return confirm('Cancel this booking?');">
-                        <button class="btn btn-outline-danger btn-sm">Cancel</button>
-                    </form>
+                    <button th:if="${b.status=='CONFIRMED'}"
+                            type="button"
+                            class="btn btn-outline-danger btn-sm js-cancel-booking"
+                            th:attr="data-booking-id=${b.id}"
+                            data-scope="admin">
+                        Cancel
+                    </button>
                 </td>
-
             </tr>
             </tbody>
+
         </table>
     </div>
 </main>
 
 <div th:replace="tags/footer :: footer"></div>
+<script src="/js/bookings.js"></script>
 </body>
 </html>
