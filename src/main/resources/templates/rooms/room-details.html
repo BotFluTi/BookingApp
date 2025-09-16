@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
 <head>
     <meta charset="UTF-8">
     <title th:text="${type} + ' Rooms - Hotel Horizon'">Rooms</title>
@@ -91,8 +92,11 @@
 
                     <button th:if="${room.available}"
                             class="btn btn-primary mt-auto"
-                            data-bs-toggle="modal" data-bs-target="#reserveModal"
-                            th:attr="data-room-id=${room.id}, data-room-number=${room.roomNumber}">
+                            th:attr="data-room-id=${room.id},
+                                     data-room-number=${room.roomNumber},
+                                     data-bs-toggle=${isAuthenticated} ? 'modal' : null,
+                                     data-bs-target=${isAuthenticated} ? '#reserveModal' : null"
+                            th:onclick="${!isAuthenticated} ? 'window.location.href=\'/login?redirect=' + currentUri + '\';' : null">
                         Reserve now
                     </button>
                     <button th:if="${!room.available}" class="btn btn-secondary mt-auto" disabled>Unavailable</button>
@@ -123,7 +127,8 @@
 
 </main>
 
-<div class="modal fade" id="reserveModal" tabindex="-1" aria-hidden="true">
+<div sec:authorize="isAuthenticated()"
+     class="modal fade" id="reserveModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form class="modal-content"
               th:action="@{'/rooms/' + ${type} + '/reserve'}"

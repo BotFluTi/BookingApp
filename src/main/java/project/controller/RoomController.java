@@ -55,6 +55,7 @@ public class RoomController {
         model.addAttribute("typeDto", roomTypeService.findByCode(type));
         model.addAttribute("rooms", roomService.findRoomsByType(type));
         model.addAttribute("nightlyRate", nightlyRate);
+        model.addAttribute("currentUri", "/rooms/" + type.name());
         return "rooms/room-details";
     }
 

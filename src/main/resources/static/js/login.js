@@ -35,9 +35,8 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem("jwt", data.token);
 
             const params = new URLSearchParams(window.location.search);
-            const next = params.get("next");
-            const dest = next && next.startsWith("/") ? next : "/";
-            console.log("[login.js] redirect ->", dest);
+            let dest = params.get("redirect") || params.get("next") || "/";
+            if (!dest.startsWith("/")) dest = "/";
             window.location.href = dest;
         } catch (err) {
             console.error("[login.js] error", err);
